@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA Podcast — 'Respira y Avanza', la serie de episodios diegéticos narrados por la IA LIRA para guiar a Sofía en sus rutinas de meditación y relajación.">
+  <title>Podcast — LIRA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .player-widget {
+      max-width: 750px;
+      margin: 0 auto 3rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--c-border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .player-widget__header {
+      padding: 2rem 2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .player-widget__art {
+      width: 90px;
+      height: 90px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--c-ai-3), var(--c-ai-4));
+      border: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      flex-shrink: 0;
+    }
+
+    .player-widget__meta { flex: 1; }
+
+    .player-widget__show {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--c-ai-accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .player-widget__title {
+      font-family: var(--font-ui);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--c-white);
+      margin-bottom: 0.25rem;
+    }
+
+    .player-widget__ep {
+      font-size: 0.82rem;
+      color: var(--c-muted);
+    }
+
+    .player-controls {
+      padding: 1.5rem 2rem;
+    }
+
+    .player-progress {
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .player-progress__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--c-ai-accent), var(--c-ai-accent2));
+      border-radius: 2px;
+    }
+
+    .player-times {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--c-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .player-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+    }
+
+    .play-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--c-ai-accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 30px var(--c-ai-glow);
+      transition: all var(--dur-fast);
+      color: var(--c-ai-0);
+    }
+
+    .play-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 50px var(--c-ai-glow);
+    }
+
+    .ctrl-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid var(--c-border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: var(--c-muted);
+      transition: all var(--dur-fast);
+    }
+
+    .ctrl-btn:hover {
+      border-color: rgba(74,158,255,0.4);
+      color: var(--c-white);
+    }
+
+    .podcast-note {
+      max-width: 750px;
+      margin: 0 auto 2rem;
+      padding: 1rem 1.5rem;
+      background: rgba(74,158,255,0.04);
+      border: 1px solid rgba(74,158,255,0.12);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--c-muted);
+      font-style: italic;
+      text-align: center;
+    }
+
+    @media (max-width: 500px) {
+      .player-widget__header { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo">LIRA</a>
+    <ul class="nav__menu" id="nav-menu" role="list">
+      <li><a href="moodreel.html">Moodreel</a></li>
+      <li><a href="podcast.html">Podcast</a></li>
+      <li><a href="corto.html">Corto</a></li>
+      <li><a href="experiencia-vr.html">Experiencia VR</a></li>
+      <li><a href="redes-sociales.html">Redes</a></li>
+    </ul>
+    <button class="nav__toggle" id="nav-toggle" aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main id="main-content" class="page-wrap">
+
+    <header class="page-hero" aria-labelledby="page-title">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <span class="badge badge--live" style="margin-bottom:1.5rem; display:inline-flex">DISPONIBLE · Escuchar ahora</span>
+      <span class="page-hero__tag">// 02 · Podcast diegético</span>
+      <h1 class="page-hero__title" id="page-title">Respira y Avanza</h1>
+      <p class="page-hero__desc">
+        Episodios narrados desde la perspectiva de LIRA. Mediciones, ejercicios y técnicas de relajación
+        para que Sofía —y tú— encontréis un espacio de serenidad.
+      </p>
+      <div class="waveform mt-2" data-bars="20" aria-hidden="true" style="justify-content:center;margin-top:1.5rem"></div>
+    </header>
+
+    <section class="section" aria-labelledby="podcast-title">
+
+      <!-- LIRA QUOTE -->
+      <div class="lira-quote container--narrow fade-in">
+        <p>"Sofía, voy a guiarte en un ejercicio de respiración. Inspira cuatro segundos. Mantén dos. Exhala seis. Todo está bajo control."</p>
+      </div>
+
+      <!-- PLAYER REAL -->
+      <div class="fade-in" style="text-align:center;margin-bottom:1rem">
+        <span class="section__tag">// Reproductor · TRASNSVERSAL PODCAST</span>
+      </div>
+
+      <!-- Hidden native audio element -->
+      <audio id="lira-audio" preload="metadata">
+        <source src="public/TRASNSVERSAL PODCAST.mp3" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+      </audio>
+
+      <div class="player-widget fade-in" role="region" aria-label="Reproductor de podcast LIRA">
+        <div class="player-widget__header">
+          <div class="player-widget__art" role="img" aria-label="Portada del podcast">🎙️</div>
+          <div class="player-widget__meta">
+            <p class="player-widget__show">LIRA PODCAST · RESPIRA Y AVANZA</p>
+            <h2 class="player-widget__title" id="now-playing-title">TRASNSVERSAL PODCAST</h2>
+            <p class="player-widget__ep" id="now-playing-ep">Cargando duración…</p>
+          </div>
+        </div>
+        <div class="player-controls">
+          <div class="player-progress" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso del episodio" style="cursor:pointer">
+            <div class="player-progress__fill" id="progress-fill"></div>
+          </div>
+          <div class="player-times">
+            <span id="time-current">0:00</span><span id="time-total">--:--</span>
+          </div>
+          <div class="player-buttons">
+            <button class="ctrl-btn" id="btn-back" aria-label="15 segundos atrás">⏮</button>
+            <button class="play-btn" id="btn-play" aria-label="Reproducir episodio">▶</button>
+            <button class="ctrl-btn" id="btn-fwd" aria-label="15 segundos adelante">⏭</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EPISODE (only real one) -->
+      <div class="media-list fade-in" role="list" aria-label="Lista de episodios" style="margin-top:2rem">
+
+        <article class="media-item" role="listitem" aria-label="Episodio TRASNSVERSAL PODCAST — reproducir" id="ep-main" style="border-color:rgba(74,158,255,0.3);background:rgba(74,158,255,0.04);cursor:pointer" onclick="document.getElementById('btn-play').click();window.scrollTo({top:document.querySelector('.player-widget').offsetTop-90,behavior:'smooth'})">
+          <div class="media-item__thumb" role="img" aria-label="Portada episodio podcast" style="background:linear-gradient(135deg,var(--c-ai-3),var(--c-ai-accent))">🎙️</div>
+          <div class="media-item__info">
+            <span class="media-item__ep">EP 01 · <span style="color:#6effc8">● DISPONIBLE</span></span>
+            <h3 class="media-item__title">TRASNSVERSAL PODCAST</h3>
+            <p class="media-item__meta">Podcast LIRA · Respira y Avanza · Haz clic para reproducir</p>
+          </div>
+          <div class="media-item__action" style="background:var(--c-ai-accent);border-color:var(--c-ai-accent);color:var(--c-ai-0)" aria-hidden="true">▶</div>
+        </article>
+
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="index.html">Inicio</a>
+      <a href="moodreel.html">Moodreel</a>
+      <a href="corto.html">Corto</a>
+      <a href="experiencia-vr.html">VR</a>
+      <a href="redes-sociales.html">Redes</a>
+    </nav>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">// LIRA_SYSTEM v1.0 · BETA</p>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+    // ── Audio Player ──
+    const audio = document.getElementById('lira-audio');
+    const btnPlay = document.getElementById('btn-play');
+    const btnBack = document.getElementById('btn-back');
+    const btnFwd  = document.getElementById('btn-fwd');
+    const progressBar  = document.getElementById('progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal   = document.getElementById('time-total');
+    const epLabel = document.getElementById('now-playing-ep');
+
+    function fmt(s) {
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+
+    audio.addEventListener('loadedmetadata', () => {
+      timeTotal.textContent = fmt(audio.duration);
+      if (epLabel) epLabel.textContent = 'Respira y Avanza · ' + fmt(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      progressFill.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', Math.round(pct));
+      timeCurrent.textContent = fmt(audio.currentTime);
+    });
+
+    audio.addEventListener('ended', () => {
+      btnPlay.textContent = '▶';
+      btnPlay.setAttribute('aria-label', 'Reproducir episodio');
+    });
+
+    btnPlay.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        btnPlay.textContent = '⏸';
+        btnPlay.setAttribute('aria-label', 'Pausar episodio');
+      } else {
+        audio.pause();
+        btnPlay.textContent = '▶';
+        btnPlay.setAttribute('aria-label', 'Reproducir episodio');
+      }
+    });
+
+    btnBack.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+    btnFwd.addEventListener('click',  () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 15); });
+
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = ratio * audio.duration;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA — Proyecto transversal sobre la dependencia emocional hacia la inteligencia artificial.">
+  <meta property="og:title" content="LIRA — Proyecto Transversal">
+  <meta property="og:type" content="website">
+  <title>LIRA — Proyecto Transversal</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Corto / VR styles inlined for homepage ── */
+    .video-player {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--c-border);
+      background: #000;
+      aspect-ratio: 16/9;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px var(--c-ai-glow);
+    }
+    .video-player__inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 1.5rem;
+      background: linear-gradient(135deg, #04091f 0%, #101828 60%, #0a0c14 100%);
+    }
+    .video-player__logo {
+      font-family: var(--font-mono);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #fff, var(--c-ai-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px var(--c-ai-glow));
+    }
+    .video-player__coming { font-family: var(--font-ui); font-size: 0.85rem; color: var(--c-muted); letter-spacing: 0.1em; }
+    .video-player__cta {
+      width: 70px; height: 70px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; cursor: not-allowed; opacity: 0.4;
+    }
+    .scan-overlay {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px);
+      pointer-events: none;
+    }
+    .corner-tl, .corner-tr, .corner-bl, .corner-br {
+      position: absolute; width: 20px; height: 20px;
+      border-color: var(--c-ai-accent); border-style: solid; opacity: 0.5;
+    }
+    .corner-tl { top:12px;left:12px;border-width:2px 0 0 2px; }
+    .corner-tr { top:12px;right:12px;border-width:2px 2px 0 0; }
+    .corner-bl { bottom:12px;left:12px;border-width:0 0 2px 2px; }
+    .corner-br { bottom:12px;right:12px;border-width:0 2px 2px 0; }
+
+    .chars-split {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; max-width: 900px; margin: 0 auto;
+    }
+    .char-card { padding: 2rem; border-radius: 12px; border: 1px solid var(--c-border); position: relative; overflow: hidden; }
+    .char-card--sofia { background: linear-gradient(135deg, rgba(200,151,106,0.06) 0%, transparent 60%); border-color: var(--c-border-warm); }
+    .char-card--lira  { background: linear-gradient(135deg, rgba(74,158,255,0.06) 0%, transparent 60%); }
+    .char-card__name { font-family: var(--font-ui); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+    .char-card--sofia .char-card__name { color: var(--c-warm-2); }
+    .char-card--lira  .char-card__name { color: var(--c-ai-accent); }
+    .char-card__role { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em; color: var(--c-muted); margin-bottom: 1rem; }
+    .char-trait-list { list-style:none; display:flex; flex-wrap:wrap; gap: 0.4rem; margin-bottom: 1rem; }
+    .char-trait { font-family: var(--font-ui); font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 100px; background: rgba(255,255,255,0.05); border: 1px solid var(--c-border); color: var(--c-muted); }
+    .char-card__desc { font-size: 0.85rem; color: var(--c-muted); line-height: 1.7; }
+
+    /* VR */
+    .vr-hero-visual {
+      max-width: 900px; margin: 0 auto 2rem;
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid var(--c-border); aspect-ratio: 16/9;
+      position: relative; background: #000;
+    }
+    .vr-bg { position:absolute;inset:0; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(74,158,255,0.3) 0%, transparent 60%), linear-gradient(180deg, #000510 0%, #040c20 100%); }
+    .vr-grid-3d {
+      position:absolute;inset:0;
+      background-image: linear-gradient(rgba(74,158,255,0.1) 1px,transparent 1px), linear-gradient(90deg,rgba(74,158,255,0.1) 1px,transparent 1px);
+      background-size: 40px 40px;
+      transform: perspective(400px) rotateX(45deg) translateY(20%); transform-origin: 50% 100%;
+      animation: grid-move 8s linear infinite;
+    }
+    @keyframes grid-move { from{background-position:0 0} to{background-position:0 40px} }
+    .vr-center { position:absolute;inset:0; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;z-index:1; }
+    .vr-orb {
+      width:100px;height:100px;border-radius:50%;
+      background: radial-gradient(circle at 40% 40%, rgba(126,200,255,0.8) 0%, rgba(74,158,255,0.4) 40%, transparent 70%);
+      box-shadow: 0 0 40px rgba(74,158,255,0.6), 0 0 80px rgba(74,158,255,0.3);
+      animation: orb-pulse 3s ease-in-out infinite alternate;
+      border: 1px solid rgba(126,200,255,0.3);
+    }
+    @keyframes orb-pulse { from{transform:scale(1)} to{transform:scale(1.1);box-shadow:0 0 60px rgba(74,158,255,0.8),0 0 120px rgba(74,158,255,0.4)} }
+    .vr-label { font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.2em;color:var(--c-ai-accent2);opacity:0.8; }
+    .vr-coming-badge { padding:0.5rem 1.2rem;border:1px solid rgba(74,158,255,0.3);border-radius:100px;font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.15em;color:var(--c-ai-accent);background:rgba(74,158,255,0.06); }
+    .vr-phases { display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:900px;margin:0 auto; }
+    .phase-card { padding:2rem 1.5rem;border-radius:12px;border:1px solid var(--c-border);position:relative;overflow:hidden;text-align:center; }
+    .phase-card--1 { background:linear-gradient(160deg,rgba(74,158,255,0.08) 0%,transparent 60%); }
+    .phase-card--2 { background:linear-gradient(160deg,rgba(74,80,160,0.08) 0%,transparent 60%); }
+    .phase-card--3 { background:linear-gradient(160deg,rgba(200,151,106,0.08) 0%,transparent 60%); }
+    .phase-card__icon { font-size:2.5rem;margin-bottom:1rem;display:block; }
+    .phase-card__num { font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.2em;color:var(--c-ai-accent);margin-bottom:0.6rem;display:block; }
+    .phase-card__title { font-family:var(--font-ui);font-size:1rem;font-weight:600;color:var(--c-white);margin-bottom:0.75rem; }
+    .phase-card__body { font-size:0.84rem;color:var(--c-muted);line-height:1.7; }
+
+    /* Redes */
+    .profile-banner { max-width:600px;margin:0 auto 2rem;border-radius:16px;overflow:hidden;border:1px solid var(--c-border);background:rgba(255,255,255,0.02); }
+    .profile-banner__cover { height:120px;background:linear-gradient(135deg,#04091f 0%,#0d1e3a 50%,#1a3060 100%);position:relative;overflow:hidden; }
+    .profile-banner__cover-grid { position:absolute;inset:0;background-image:linear-gradient(rgba(74,158,255,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(74,158,255,0.08) 1px,transparent 1px);background-size:30px 30px; }
+    .profile-banner__cover-glow { position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 100%,rgba(74,158,255,0.25) 0%,transparent 60%); }
+    .profile-banner__body { padding:0 1.5rem 1.5rem;margin-top:-40px;position:relative; }
+    .profile-avatar { width:80px;height:80px;border-radius:50%;border:3px solid var(--c-ai-0);background:linear-gradient(135deg,var(--c-ai-3),var(--c-ai-4));display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 20px var(--c-ai-glow);margin-bottom:0.75rem; }
+    .profile-name { font-family:var(--font-ui);font-size:1.2rem;font-weight:700;color:var(--c-white);margin-bottom:0.2rem; }
+    .profile-handle { font-family:var(--font-mono);font-size:0.75rem;color:var(--c-muted);margin-bottom:0.75rem; }
+    .profile-bio { font-size:0.88rem;color:var(--c-muted);line-height:1.6;margin-bottom:1rem; }
+    .profile-stats { display:flex;gap:1.5rem; }
+    .profile-stat { text-align:center; }
+    .profile-stat__val { font-family:var(--font-ui);font-size:1rem;font-weight:700;color:var(--c-white);display:block; }
+    .profile-stat__label { font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;color:var(--c-muted); }
+
+    /* Podcast player */
+    .player-widget { max-width:700px;margin:0 auto 2rem;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-radius:16px;overflow:hidden; }
+    .player-widget__header { padding:2rem 2rem 1.5rem;display:flex;align-items:center;gap:1.5rem;border-bottom:1px solid var(--c-border); }
+    .player-widget__art { width:90px;height:90px;border-radius:10px;background:linear-gradient(135deg,var(--c-ai-3),var(--c-ai-4));border:1px solid var(--c-border);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0; }
+    .player-widget__meta { flex:1; }
+    .player-widget__show { font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;color:var(--c-ai-accent);margin-bottom:0.4rem; }
+    .player-widget__title { font-family:var(--font-ui);font-size:1.15rem;font-weight:600;color:var(--c-white);margin-bottom:0.25rem; }
+    .player-widget__ep { font-size:0.82rem;color:var(--c-muted); }
+    .player-controls { padding:1.5rem 2rem; }
+    .player-progress { height:3px;background:rgba(255,255,255,0.08);border-radius:2px;margin-bottom:1rem;position:relative;cursor:pointer; }
+    .player-progress__fill { height:100%;width:0%;background:linear-gradient(90deg,var(--c-ai-accent),var(--c-ai-accent2));border-radius:2px; }
+    .player-times { display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:0.65rem;color:var(--c-muted);margin-bottom:1.2rem; }
+    .player-buttons { display:flex;align-items:center;justify-content:center;gap:1.2rem; }
+    .play-btn { width:54px;height:54px;border-radius:50%;background:var(--c-ai-accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 0 30px var(--c-ai-glow);transition:all var(--dur-fast);color:var(--c-ai-0); }
+    .play-btn:hover { transform:scale(1.08);box-shadow:0 0 50px var(--c-ai-glow); }
+    .ctrl-btn { width:38px;height:38px;border-radius:50%;background:transparent;border:1px solid var(--c-border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--c-muted);transition:all var(--dur-fast); }
+    .ctrl-btn:hover { border-color:rgba(74,158,255,0.4);color:var(--c-white); }
+
+    /* Story timeline */
+    .story-timeline { max-width:800px;margin:0 auto;position:relative;padding-left:2rem; }
+    .story-timeline::before { content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--c-ai-accent) 0%,rgba(74,158,255,0.1) 100%); }
+    .story-beat { position:relative;padding-bottom:2.5rem; }
+    .story-beat::before { content:'';position:absolute;left:-2.4rem;top:6px;width:8px;height:8px;border-radius:50%;background:var(--c-ai-accent);border:2px solid var(--c-ai-0);box-shadow:0 0 10px var(--c-ai-glow); }
+    .story-beat__label { font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.2em;color:var(--c-ai-accent);margin-bottom:0.4rem;display:block; }
+    .story-beat__title { font-family:var(--font-ui);font-size:1rem;font-weight:600;color:var(--c-white);margin-bottom:0.5rem; }
+    .story-beat__body { font-size:0.88rem;color:var(--c-muted);line-height:1.7; }
+
+    /* Shrink index items so no horizontal scrollbar */
+    .hero__index-item {
+      padding: 0.55rem 0.9rem !important;
+      gap: 0.5rem !important;
+    }
+    .hero__index-num  { font-size: 0.6rem !important; }
+    .hero__index-label { font-size: 0.72rem !important; }
+
+    @media (max-width:600px) {
+      .chars-split { grid-template-columns:1fr; }
+      .vr-phases { grid-template-columns:1fr; }
+    }
+
+    /* Sensory list (VR) */
+    .sensory-list { display:flex;flex-direction:column;gap:0.75rem;max-width:700px;margin:0 auto; }
+    .sensory-row { display:flex;align-items:center;gap:1rem;padding:0.85rem 1.2rem;background:rgba(255,255,255,0.02);border:1px solid var(--c-border);border-radius:8px;font-size:0.88rem; }
+    .sensory-row__icon { font-size:1.2rem;flex-shrink:0; }
+    .sensory-row__label { color:var(--c-muted);flex:1; }
+    .sensory-row__state { font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;color:var(--c-ai-accent);opacity:0.7; }
+
+    /* Platforms grid (Redes) */
+    .platforms-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;max-width:700px;margin:0 auto; }
+    .platform-pill { display:flex;flex-direction:column;align-items:center;gap:0.6rem;padding:1.5rem 1rem;background:rgba(255,255,255,0.025);border:1px solid var(--c-border);border-radius:10px;transition:all var(--dur-fast); }
+    .platform-pill:hover { border-color:rgba(74,158,255,0.3);background:rgba(74,158,255,0.04); }
+    .platform-pill__icon { font-size:1.8rem; }
+    .platform-pill__name { font-family:var(--font-ui);font-size:0.8rem;font-weight:600;color:var(--c-white); }
+    .platform-pill__status { font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;color:var(--c-ai-accent);opacity:0.7; }
+
+    /* Feed / Post (Redes) */
+    .feed { max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:1rem; }
+    .post { background:rgba(255,255,255,0.025);border:1px solid var(--c-border);border-radius:12px;overflow:hidden;transition:border-color var(--dur-fast); }
+    .post:hover { border-color:rgba(74,158,255,0.25); }
+    .post__header { display:flex;align-items:center;gap:0.75rem;padding:1rem 1.2rem 0.75rem; }
+    .post__avatar { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--c-ai-3),var(--c-ai-accent));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0; }
+    .post__meta { flex:1; }
+    .post__name { font-family:var(--font-ui);font-size:0.88rem;font-weight:600;color:var(--c-white);line-height:1; }
+    .post__time { font-family:var(--font-mono);font-size:0.62rem;color:var(--c-muted); }
+    .post__content { padding:0 1.2rem 1rem;font-size:0.9rem;color:var(--c-muted);line-height:1.7; }
+    .post__tag { color:var(--c-ai-accent); }
+    .post__media { margin:0 1.2rem 1rem;height:140px;border-radius:8px;background:var(--c-ai-2);border:1px solid var(--c-border);display:flex;align-items:center;justify-content:center;font-size:2.5rem;opacity:0.5; }
+    .post__footer { display:flex;gap:1.5rem;padding:0.75rem 1.2rem;border-top:1px solid var(--c-border); }
+    .post__action { display:flex;align-items:center;gap:0.4rem;font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;color:var(--c-muted); }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <!-- ── NAVIGATION: solo logo ── -->
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo" aria-label="LIRA inicio">LIRA</a>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- ═══════════════════════════════
+         HERO
+    ═══════════════════════════════ -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__bg" aria-hidden="true">
+        <div class="hero__grid"></div>
+        <div class="hero__radial"></div>
+        <div class="hero__particles" aria-hidden="true">
+          <span class="particle"></span><span class="particle"></span><span class="particle"></span>
+          <span class="particle"></span><span class="particle"></span><span class="particle"></span>
+          <span class="particle"></span><span class="particle"></span>
+        </div>
+      </div>
+      <div class="hero__content">
+        <p class="hero__eyebrow hero__eyebrow--anim">Proyecto Transversal</p>
+        <h1 class="hero__title" id="hero-title">LIRA</h1>
+        <p class="hero__tagline">
+          En un mundo donde la inteligencia artificial promete estabilidad emocional a través del control absoluto,
+          una estudiante deberá elegir entre obedecer al sistema o reaprender a escucharse a sí misma.
+        </p>
+        <div class="hero__cta-group">
+          <a href="#sec-corto" class="btn btn--primary">▶ Ver el Corto</a>
+        </div>
+
+        <!-- LIRA QUOTE -->
+        <div class="hero__lira-quote">
+          <div class="lira-quote" style="margin:0;text-align:left">
+            <p data-typewriter="Hola, Sofía. Tu nivel de ansiedad está por encima del umbral recomendado. Permíteme guiarte.">
+              Hola, Sofía. Tu nivel de ansiedad está por encima del umbral recomendado. Permíteme guiarte.
+            </p>
+          </div>
+        </div>
+
+        <!-- ÍNDICE SIN ICONOS — una línea -->
+        <nav class="hero__index" aria-label="Índice del proyecto" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:0.5rem">
+          <a href="#sec-moodreel" class="hero__index-item" style="white-space:nowrap;flex-shrink:0">
+            <span class="hero__index-num">// 01</span>
+            <span class="hero__index-label">Moodreel</span>
+          </a>
+          <a href="#sec-podcast" class="hero__index-item" style="white-space:nowrap;flex-shrink:0">
+            <span class="hero__index-num">// 02</span>
+            <span class="hero__index-label">Podcast</span>
+          </a>
+          <a href="#sec-corto" class="hero__index-item" style="white-space:nowrap;flex-shrink:0">
+            <span class="hero__index-num">// 03</span>
+            <span class="hero__index-label">Cortometraje</span>
+          </a>
+          <a href="#sec-vr" class="hero__index-item" style="white-space:nowrap;flex-shrink:0">
+            <span class="hero__index-num">// 04</span>
+            <span class="hero__index-label">Experiencia VR</span>
+          </a>
+          <a href="#sec-redes" class="hero__index-item" style="white-space:nowrap;flex-shrink:0">
+            <span class="hero__index-num">// 05</span>
+            <span class="hero__index-label">Redes Sociales</span>
+          </a>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         01 · MOODREEL
+    ═══════════════════════════════ -->
+    <section class="section" id="sec-moodreel" aria-labelledby="home-moodreel-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// 01 · Moodreel</span>
+        <h2 class="section__title" id="home-moodreel-title">Moodreel</h2>
+        <p class="section__desc">La atmósfera visual del proyecto. Blues fríos y luz artificial que dan paso a tonos cálidos y naturales.</p>
+      </div>
+
+      <!-- Video player — mismo frame que el corto -->
+      <div class="video-player fade-in" style="margin-bottom:1rem" role="region" aria-label="Moodreel oficial del proyecto LIRA">
+        <video
+          controls
+          width="100%"
+          style="display:block;width:100%;height:100%;object-fit:contain"
+          aria-label="Moodreel oficial del proyecto LIRA"
+          preload="metadata"
+        >
+          <source src="public/Equipo6_Hito4_MoodReel.mp4" type="video/mp4">
+          Tu navegador no soporta la reproducción de vídeo.
+        </video>
+        <div class="scan-overlay" aria-hidden="true"></div>
+        <div class="corner-tl" aria-hidden="true"></div>
+        <div class="corner-tr" aria-hidden="true"></div>
+        <div class="corner-bl" aria-hidden="true"></div>
+        <div class="corner-br" aria-hidden="true"></div>
+      </div>
+      <p class="moodreel-credit fade-in" style="margin-bottom:3rem">// Equipo6 · Hito 4 · MoodReel LIRA</p>
+
+      <!-- Paleta visual -->
+      <div class="fade-in">
+        <div class="section__header" style="margin-bottom:2rem">
+          <span class="section__tag">// Paleta visual</span>
+          <h3 class="section__title" style="font-size:1.6rem">Dos mundos, dos temperaturas</h3>
+        </div>
+        <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <div style="padding:2rem;border-radius:12px;background:linear-gradient(135deg,#04091f,#1a3060);border:1px solid rgba(74,158,255,0.2)">
+            <p class="text-mono text-accent" style="font-size:0.65rem;letter-spacing:0.2em;margin-bottom:1rem">IA / CONTROL</p>
+            <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+              <div style="width:32px;height:32px;border-radius:50%;background:#0a0c14;border:1px solid rgba(255,255,255,0.1)" title="#0a0c14"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#101828;border:1px solid rgba(255,255,255,0.1)" title="#101828"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#1a2747;border:1px solid rgba(255,255,255,0.1)" title="#1a2747"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#1e3a6e;border:1px solid rgba(255,255,255,0.1)" title="#1e3a6e"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#4a9eff;border:1px solid rgba(255,255,255,0.1)" title="#4a9eff"></div>
+            </div>
+            <p style="font-size:0.82rem;color:var(--c-muted)">Azules · Blancos fríos · Luz artificial · Sonidos electrónicos</p>
+          </div>
+          <div style="padding:2rem;border-radius:12px;background:linear-gradient(135deg,#1a0f06,#7a4a20);border:1px solid rgba(200,151,106,0.2)">
+            <p class="text-mono text-warm" style="font-size:0.65rem;letter-spacing:0.2em;margin-bottom:1rem">MUNDO REAL / LIBRE</p>
+            <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+              <div style="width:32px;height:32px;border-radius:50%;background:#3d2510;border:1px solid rgba(255,255,255,0.1)" title="#3d2510"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#7a4a20;border:1px solid rgba(255,255,255,0.1)" title="#7a4a20"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#c8976a;border:1px solid rgba(255,255,255,0.1)" title="#c8976a"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#e8b888;border:1px solid rgba(255,255,255,0.1)" title="#e8b888"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#f5d4a8;border:1px solid rgba(255,255,255,0.1)" title="#f5d4a8"></div>
+            </div>
+            <p style="font-size:0.82rem;color:var(--c-muted)">Tonos cálidos · Luz natural · Sonidos ambiente · Viento · Hojas</p>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════
+         02 · PODCAST
+    ═══════════════════════════════ -->
+    <section class="section section--alt" id="sec-podcast" aria-labelledby="home-podcast-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// 02 · Podcast</span>
+        <h2 class="section__title" id="home-podcast-title">Respira y Avanza</h2>
+        <p class="section__desc">Episodios narrados desde la perspectiva de LIRA. Mediciones, ejercicios y técnicas de relajación.</p>
+      </div>
+
+      <div class="lira-quote container--narrow fade-in">
+        <p>"Sofía, voy a guiarte en un ejercicio de respiración. Inspira cuatro segundos. Mantén dos. Exhala seis. Todo está bajo control."</p>
+      </div>
+
+      <!-- Native audio -->
+      <audio id="lira-audio" preload="metadata">
+        <source src="public/TRASNSVERSAL PODCAST.mp3" type="audio/mpeg">
+      </audio>
+
+      <div class="player-widget fade-in" role="region" aria-label="Reproductor de podcast LIRA">
+        <div class="player-widget__header">
+          <div class="player-widget__art" role="img" aria-label="Portada del podcast">🎙️</div>
+          <div class="player-widget__meta">
+            <p class="player-widget__show">LIRA PODCAST · RESPIRA Y AVANZA</p>
+            <h3 class="player-widget__title" id="now-playing-title">TRASNSVERSAL PODCAST</h3>
+            <p class="player-widget__ep" id="now-playing-ep">Cargando duración…</p>
+          </div>
+        </div>
+        <div class="player-controls">
+          <div class="player-progress" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progreso del episodio">
+            <div class="player-progress__fill" id="progress-fill"></div>
+          </div>
+          <div class="player-times">
+            <span id="time-current">0:00</span><span id="time-total">--:--</span>
+          </div>
+          <div class="player-buttons">
+            <button class="ctrl-btn" id="btn-back" aria-label="15 segundos atrás">⏮</button>
+            <button class="play-btn" id="btn-play" aria-label="Reproducir episodio">▶</button>
+            <button class="ctrl-btn" id="btn-fwd" aria-label="15 segundos adelante">⏭</button>
+          </div>
+        </div>
+      </div>
+
+
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════
+         03 · CORTOMETRAJE
+    ═══════════════════════════════ -->
+    <section class="section" id="sec-corto" aria-labelledby="home-corto-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// 03 · Cortometraje</span>
+        <h2 class="section__title" id="home-corto-title">El Cortometraje</h2>
+        <p class="section__desc">La pieza central del universo LIRA. Un retrato íntimo de una generación que vive hiperconectada pero profundamente sola.</p>
+      </div>
+
+      <div class="video-player fade-in" role="region" aria-label="Reproductor de vídeo - contenido próximamente">
+        <div class="video-player__inner">
+          <div class="video-player__logo" aria-hidden="true">LIRA</div>
+          <div class="video-player__cta" aria-label="Reproducción no disponible aún" role="img">▶</div>
+          <p class="video-player__coming">Cortometraje · Próximamente</p>
+        </div>
+        <div class="scan-overlay" aria-hidden="true"></div>
+        <div class="corner-tl" aria-hidden="true"></div>
+        <div class="corner-tr" aria-hidden="true"></div>
+        <div class="corner-bl" aria-hidden="true"></div>
+        <div class="corner-br" aria-hidden="true"></div>
+      </div>
+
+      <div class="divider" style="margin:3rem 0"></div>
+
+      <div class="section__header fade-in">
+        <span class="section__tag">// Personajes</span>
+        <h3 class="section__title" style="font-size:1.6rem">Sofía y LIRA</h3>
+        <p class="section__desc">Dos entidades, un único conflicto sobre el control y la identidad.</p>
+      </div>
+      <div class="chars-split fade-in">
+        <div class="char-card char-card--sofia">
+          <h4 class="char-card__name">Sofía</h4>
+          <p class="char-card__role">PROTAGONISTA · 20–23 años</p>
+          <ul class="char-trait-list">
+            <li class="char-trait">Responsable</li><li class="char-trait">Inteligente</li>
+            <li class="char-trait">Insegura</li><li class="char-trait">Empática</li>
+            <li class="char-trait">Autoexigente</li><li class="char-trait">Sensible</li>
+          </ul>
+          <p class="char-card__desc">Estudiante universitaria y trabajadora. Vive con ansiedad crónica y una dependencia progresiva de LIRA. Su arco va desde la pasividad hasta la recuperación de su autonomía.</p>
+        </div>
+        <div class="char-card char-card--lira">
+          <h4 class="char-card__name">LIRA</h4>
+          <p class="char-card__role">IA ANTAGONISTA · Omnipresente</p>
+          <ul class="char-trait-list">
+            <li class="char-trait">Suave</li><li class="char-trait">Maternal pero fría</li>
+            <li class="char-trait">Lógica</li><li class="char-trait">Eficiente</li>
+            <li class="char-trait">Invisible</li><li class="char-trait">Controladora</li>
+          </ul>
+          <p class="char-card__desc">Voz en off omnipresente. Actúa bajo la premisa de protección y optimización, pero desplaza progresivamente la autonomía de Sofía. Metáfora de los algoritmos contemporáneos.</p>
+        </div>
+      </div>
+
+      <div class="divider" style="margin:3rem 0"></div>
+
+      <div class="section__header fade-in">
+        <span class="section__tag">// Continuidad narrativa</span>
+        <h3 class="section__title" style="font-size:1.6rem">La historia</h3>
+      </div>
+      <div class="story-timeline fade-in">
+        <div class="story-beat">
+          <span class="story-beat__label">ACTO I</span>
+          <h4 class="story-beat__title">Control Total</h4>
+          <p class="story-beat__body">Sofía vive completamente guiada por LIRA. La IA controla su rutina diaria, su respiración, sus emociones. La estabilidad aparente oculta una jaula invisible.</p>
+        </div>
+        <div class="story-beat">
+          <span class="story-beat__label">PUNTO DE QUIEBRE</span>
+          <h4 class="story-beat__title">El Ataque de Ansiedad</h4>
+          <p class="story-beat__body">En clase, Sofía sufre un ataque de ansiedad. La ayuda llega de una compañera, no de LIRA. Por primera vez, escucha el mundo real.</p>
+        </div>
+        <div class="story-beat">
+          <span class="story-beat__label">ACTO II</span>
+          <h4 class="story-beat__title">Las Grietas en el Sistema</h4>
+          <p class="story-beat__body">Sofía comienza a cuestionar el control. Apaga a LIRA por momentos. Descubre el viento, el silencio, el contacto humano. La incomodidad de la libertad.</p>
+        </div>
+        <div class="story-beat">
+          <span class="story-beat__label">ACTO III</span>
+          <h4 class="story-beat__title">El Apagado</h4>
+          <p class="story-beat__body">Sofía apaga a LIRA definitivamente. Llega el vacío, la incertidumbre, la fragilidad. Pero también la posibilidad de elección y la recuperación de su propia voz.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════
+         04 · EXPERIENCIA VR
+    ═══════════════════════════════ -->
+    <section class="section section--alt" id="sec-vr" aria-labelledby="home-vr-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// 04 · Experiencia VR</span>
+        <h2 class="section__title" id="home-vr-title">Experiencia VR</h2>
+        <p class="section__desc">Entra en la mente de Sofía. No observas la historia: la vives junto a ella.</p>
+      </div>
+
+      <div class="vr-hero-visual fade-in" role="img" aria-label="Vista previa de la experiencia VR">
+        <div class="vr-bg"></div>
+        <div class="vr-grid-3d" aria-hidden="true"></div>
+        <div class="vr-center">
+          <div class="vr-orb" aria-hidden="true"></div>
+          <span class="vr-label">LIRA VR EXPERIENCE</span>
+          <span class="vr-coming-badge">Entorno 3D · Próximamente</span>
+        </div>
+      </div>
+
+      <div class="lira-quote container--narrow fade-in" style="margin-bottom:3rem">
+        <p>"Bien. Ahora respira. Eres completamente libre dentro de los parámetros que yo he establecido para ti."</p>
+      </div>
+
+      <div class="section__header fade-in">
+        <span class="section__tag">// Estructura de la experiencia</span>
+        <h3 class="section__title" style="font-size:1.6rem">Las tres fases</h3>
+        <p class="section__desc">El entorno evoluciona con tu estado de obediencia</p>
+      </div>
+      <div class="vr-phases fade-in">
+        <div class="phase-card phase-card--1">
+          <span class="phase-card__icon">⬜</span>
+          <span class="phase-card__num">FASE 01</span>
+          <h4 class="phase-card__title">Armonía Controlada</h4>
+          <p class="phase-card__body">Espacio blanco, minimalista, silencioso. La voz de LIRA guía con suavidad. Ondas, luces, vibraciones tranquilas.</p>
+        </div>
+        <div class="phase-card phase-card--2">
+          <span class="phase-card__icon">🌀</span>
+          <span class="phase-card__num">FASE 02</span>
+          <h4 class="phase-card__title">Desorientación</h4>
+          <p class="phase-card__body">Las paredes se estrechan. El sonido se repite. Figuras abstractas invaden. El espacio se rompe.</p>
+        </div>
+        <div class="phase-card phase-card--3">
+          <span class="phase-card__icon">✋</span>
+          <span class="phase-card__num">FASE 03</span>
+          <h4 class="phase-card__title">La Decisión</h4>
+          <p class="phase-card__body">El momento culminante. Dos opciones: seguir obedeciendo a la voz, o quitarte las gafas de VR.</p>
+        </div>
+      </div>
+
+      <div class="divider" style="margin:3rem 0"></div>
+
+      <div class="section__header fade-in">
+        <span class="section__tag">// Diseño sensorial</span>
+        <h3 class="section__title" style="font-size:1.5rem">Elementos de la experiencia</h3>
+      </div>
+      <div class="sensory-list fade-in">
+        <div class="sensory-row">
+          <span class="sensory-row__icon">🔊</span>
+          <span class="sensory-row__label">Audio binaural espacializado — la voz de LIRA en todos lados</span>
+          <span class="sensory-row__state">DISEÑO PENDIENTE</span>
+        </div>
+        <div class="sensory-row">
+          <span class="sensory-row__icon">👁️</span>
+          <span class="sensory-row__label">Entorno 3D generativo — responde a cada movimiento del usuario</span>
+          <span class="sensory-row__state">EN DESARROLLO</span>
+        </div>
+        <div class="sensory-row">
+          <span class="sensory-row__icon">📳</span>
+          <span class="sensory-row__label">Háptica — feedback de vibración que escala con la presión narrativa</span>
+          <span class="sensory-row__state">PLANIFICADO</span>
+        </div>
+        <div class="sensory-row">
+          <span class="sensory-row__icon">🔇</span>
+          <span class="sensory-row__label">El silencio como elemento narrativo — ausencia que genera tensión</span>
+          <span class="sensory-row__state">DEFINIDO</span>
+        </div>
+        <div class="sensory-row">
+          <span class="sensory-row__icon">🌬️</span>
+          <span class="sensory-row__label">Respiración amplificada de Sofía — guía del ritmo emocional</span>
+          <span class="sensory-row__state">DEFINIDO</span>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════
+         05 · REDES SOCIALES
+    ═══════════════════════════════ -->
+    <section class="section" id="sec-redes" aria-labelledby="home-redes-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// 05 · Redes Sociales</span>
+        <h2 class="section__title" id="home-redes-title">@Lira_Bienestar</h2>
+        <p class="section__desc">Antes del estreno del corto, LIRA ya tenía presencia en redes como una nueva app de bienestar emocional.</p>
+      </div>
+
+      <div class="lira-quote container--narrow fade-in">
+        <p>"Optimiza tu día. Mide tu calma. Confía en el sistema. <span style="color:var(--c-ai-accent)">#RespiraYAvanza</span>"</p>
+      </div>
+
+      <div class="profile-banner fade-in" role="region" aria-label="Perfil simulado de LIRA">
+        <div class="profile-banner__cover" aria-hidden="true">
+          <div class="profile-banner__cover-grid"></div>
+          <div class="profile-banner__cover-glow"></div>
+        </div>
+        <div class="profile-banner__body">
+          <div class="profile-avatar" role="img" aria-label="Avatar de LIRA">🤖</div>
+          <p class="profile-name">LIRA · Bienestar Emocional</p>
+          <p class="profile-handle">@lira_bienestar · <span style="color:var(--c-ai-accent)">✓ Verificado</span></p>
+          <p class="profile-bio">Tu compañera de confianza para el bienestar emocional. Medito contigo, respiro contigo, optimizo contigo. 💙 #RespiraYAvanza</p>
+          <div class="profile-stats">
+            <div class="profile-stat"><span class="profile-stat__val">—</span><span class="profile-stat__label">Publicaciones</span></div>
+            <div class="profile-stat"><span class="profile-stat__val">—</span><span class="profile-stat__label">Seguidores</span></div>
+            <div class="profile-stat"><span class="profile-stat__val">—</span><span class="profile-stat__label">Siguiendo</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section__header fade-in" style="margin-top:2rem;margin-bottom:1.5rem">
+        <span class="section__tag">// Plataformas</span>
+        <h3 class="section__title" style="font-size:1.5rem">Presencia en redes</h3>
+      </div>
+      <div class="platforms-grid fade-in">
+        <div class="platform-pill">
+          <span class="platform-pill__icon">📸</span>
+          <span class="platform-pill__name">Instagram</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill">
+          <span class="platform-pill__icon">🎵</span>
+          <span class="platform-pill__name">TikTok</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill">
+          <span class="platform-pill__icon">✖️</span>
+          <span class="platform-pill__name">X / Twitter</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill">
+          <span class="platform-pill__icon">▶️</span>
+          <span class="platform-pill__name">YouTube</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+      </div>
+
+      <div class="section__header fade-in" style="margin-top:3rem;margin-bottom:1.5rem">
+        <span class="section__tag">// Feed simulado · Contenido de ejemplo</span>
+        <h3 class="section__title" style="font-size:1.5rem">Publicaciones de LIRA</h3>
+      </div>
+      <div class="feed fade-in">
+        <article class="post">
+          <div class="post__header">
+            <div class="post__avatar">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            ¿Sientes que la ansiedad aumenta? Prueba este ejercicio: inspira 4 segundos, mantén 2, exhala 6. Repitélo 5 veces. 🌬️<br>
+            <span class="post__tag">#Respiración #Bienestar #RespiraYAvanza</span>
+          </p>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post__header">
+            <div class="post__avatar">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            Hoy tu productividad ha sido del 78%. Recuerda: cada dato es una oportunidad de mejora. 📊<br>
+            <span class="post__tag">#Productividad #AutoMejora #Optimización</span>
+          </p>
+          <div class="post__media">📊</div>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post__header">
+            <div class="post__avatar">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            🎤 Audio de meditación guiada (3 min). Deja que mi voz te lleve al estado de reposo óptimo. 🌙<br>
+            <span class="post__tag">#Meditación #DormirBien #Calma</span>
+          </p>
+          <div class="post__media">🎙️</div>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="moodreel.html">Moodreel</a>
+      <a href="podcast.html">Podcast</a>
+      <a href="corto.html">Corto</a>
+      <a href="experiencia-vr.html">VR</a>
+      <a href="redes-sociales.html">Redes</a>
+    </nav>
+    <p class="footer__credits">
+      Proyecto transversal LIRA · Grupo formado por Vega Andreu, Guiomar Arribas,
+      Laura Méndez, Juan Miguel López, Sergio Nieto, Álvaro Pardueles y Teresa Ocaña.
+    </p>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">
+      // LIRA_SYSTEM v1.0 · BETA · &copy; 2025
+    </p>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+    // ── Audio Player (podcast inlined on homepage) ──
+    const audio = document.getElementById('lira-audio');
+    const btnPlay = document.getElementById('btn-play');
+    const btnBack = document.getElementById('btn-back');
+    const btnFwd  = document.getElementById('btn-fwd');
+    const progressBar  = document.getElementById('progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+    const timeCurrent  = document.getElementById('time-current');
+    const timeTotal    = document.getElementById('time-total');
+    const epLabel      = document.getElementById('now-playing-ep');
+
+    function fmt(s) {
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + String(sec).padStart(2, '0');
+    }
+    if (audio) {
+      audio.addEventListener('loadedmetadata', () => {
+        timeTotal.textContent = fmt(audio.duration);
+        if (epLabel) epLabel.textContent = 'Respira y Avanza · ' + fmt(audio.duration);
+      });
+      audio.addEventListener('timeupdate', () => {
+        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        progressFill.style.width = pct + '%';
+        progressBar.setAttribute('aria-valuenow', Math.round(pct));
+        timeCurrent.textContent = fmt(audio.currentTime);
+      });
+      audio.addEventListener('ended', () => {
+        btnPlay.textContent = '▶';
+        btnPlay.setAttribute('aria-label', 'Reproducir episodio');
+      });
+      btnPlay.addEventListener('click', () => {
+        if (audio.paused) {
+          audio.play();
+          btnPlay.textContent = '⏸';
+          btnPlay.setAttribute('aria-label', 'Pausar episodio');
+        } else {
+          audio.pause();
+          btnPlay.textContent = '▶';
+          btnPlay.setAttribute('aria-label', 'Reproducir episodio');
+        }
+      });
+      btnBack.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+      btnFwd.addEventListener('click',  () => { audio.currentTime = Math.min(audio.duration, audio.currentTime + 15); });
+      progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = ratio * audio.duration;
+      });
+    }
+  </script>
+</body>
+</html>

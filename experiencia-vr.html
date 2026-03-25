@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA Experiencia VR — Entra en la mente de Sofía. Una experiencia inmersiva en 3D que evoluciona del orden controlado al caos claustrofóbico hasta el momento de decisión.">
+  <title>Experiencia VR — LIRA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .vr-hero-visual {
+      max-width: 900px;
+      margin: 0 auto 3rem;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--c-border);
+      aspect-ratio: 16/9;
+      position: relative;
+      background: #000;
+    }
+
+    .vr-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(74,158,255,0.3) 0%, transparent 60%),
+        linear-gradient(180deg, #000510 0%, #040c20 100%);
+    }
+
+    .vr-grid-3d {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,158,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,158,255,0.1) 1px, transparent 1px);
+      background-size: 40px 40px;
+      transform: perspective(400px) rotateX(45deg) translateY(20%);
+      transform-origin: 50% 100%;
+      animation: grid-move 8s linear infinite;
+    }
+
+    @keyframes grid-move {
+      from { background-position: 0 0; }
+      to { background-position: 0 40px; }
+    }
+
+    .vr-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      z-index: 1;
+    }
+
+    .vr-orb {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, rgba(126,200,255,0.8) 0%, rgba(74,158,255,0.4) 40%, transparent 70%);
+      box-shadow: 0 0 40px rgba(74,158,255,0.6), 0 0 80px rgba(74,158,255,0.3), inset 0 0 30px rgba(126,200,255,0.3);
+      animation: orb-pulse 3s ease-in-out infinite alternate;
+      border: 1px solid rgba(126,200,255,0.3);
+    }
+
+    @keyframes orb-pulse {
+      from { transform: scale(1); box-shadow: 0 0 40px rgba(74,158,255,0.6), 0 0 80px rgba(74,158,255,0.3); }
+      to { transform: scale(1.1); box-shadow: 0 0 60px rgba(74,158,255,0.8), 0 0 120px rgba(74,158,255,0.4); }
+    }
+
+    .vr-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--c-ai-accent2);
+      opacity: 0.8;
+    }
+
+    .vr-coming-badge {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid rgba(74,158,255,0.3);
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      color: var(--c-ai-accent);
+      background: rgba(74,158,255,0.06);
+    }
+
+    /* Phase timeline */
+    .vr-phases {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .phase-card {
+      padding: 2rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--c-border);
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .phase-card::before {
+      content: attr(data-num);
+      font-family: var(--font-mono);
+      font-size: 5rem;
+      font-weight: 700;
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.04;
+      color: var(--c-ai-accent);
+      pointer-events: none;
+    }
+
+    .phase-card--1 { background: linear-gradient(160deg, rgba(74,158,255,0.08) 0%, transparent 60%); }
+    .phase-card--2 { background: linear-gradient(160deg, rgba(74,80,160,0.08) 0%, transparent 60%); }
+    .phase-card--3 { background: linear-gradient(160deg, rgba(200,151,106,0.08) 0%, transparent 60%); }
+
+    .phase-card__icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    .phase-card__num {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      color: var(--c-ai-accent);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .phase-card__title {
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--c-white);
+      margin-bottom: 0.75rem;
+    }
+
+    .phase-card__body {
+      font-size: 0.84rem;
+      color: var(--c-muted);
+      line-height: 1.7;
+    }
+
+    .sensory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .sensory-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1.2rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+
+    .sensory-row__icon { font-size:1.2rem; flex-shrink:0; }
+    .sensory-row__label { color: var(--c-muted); flex: 1; }
+    .sensory-row__state {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--c-ai-accent);
+      opacity: 0.7;
+    }
+
+    @media (max-width: 700px) {
+      .vr-phases { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo">LIRA</a>
+    <ul class="nav__menu" id="nav-menu" role="list">
+      <li><a href="moodreel.html">Moodreel</a></li>
+      <li><a href="podcast.html">Podcast</a></li>
+      <li><a href="corto.html">Corto</a></li>
+      <li><a href="experiencia-vr.html">Experiencia VR</a></li>
+      <li><a href="redes-sociales.html">Redes</a></li>
+    </ul>
+    <button class="nav__toggle" id="nav-toggle" aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main id="main-content" class="page-wrap">
+
+    <header class="page-hero" aria-labelledby="page-title">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <span class="badge badge--beta" style="margin-bottom:1.5rem; display:inline-flex">BETA · En desarrollo</span>
+      <span class="page-hero__tag">// 04 · Experiencia VR</span>
+      <h1 class="page-hero__title" id="page-title">Experiencia VR</h1>
+      <p class="page-hero__desc">
+        Entra en la mente de Sofía. No observas la historia: la vives junto a ella. Del orden sereno al caos
+        claustrofóbico. Del control a la elección.
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="vr-visual-label">
+
+      <!-- VR PREVIEW -->
+      <div class="section__header fade-in" style="margin-bottom:2rem">
+        <span class="section__tag" id="vr-visual-label">// Entorno inmersivo · próximamente</span>
+      </div>
+
+      <div class="vr-hero-visual fade-in" role="img" aria-label="Vista previa de la experiencia VR — espacio digital">
+        <div class="vr-bg"></div>
+        <div class="vr-grid-3d" aria-hidden="true"></div>
+        <div class="vr-center">
+          <div class="vr-orb" aria-hidden="true"></div>
+          <span class="vr-label">LIRA VR EXPERIENCE</span>
+          <span class="vr-coming-badge">Entorno 3D · Próximamente</span>
+        </div>
+      </div>
+
+      <div class="lira-quote container--narrow fade-in" style="margin-bottom:3rem">
+        <p>"Bien. Ahora respira. Eres completamente libre dentro de los parámetros que yo he establecido para ti."</p>
+      </div>
+
+      <!-- PHASES -->
+      <div class="section__header fade-in">
+        <span class="section__tag">// Estructura de la experiencia</span>
+        <h2 class="section__title" id="phases-title">Las tres fases</h2>
+        <p class="section__desc">El entorno evoluciona con tu estado de obediencia</p>
+      </div>
+
+      <div class="vr-phases fade-in" role="list" aria-label="Fases de la experiencia VR">
+
+        <div class="phase-card phase-card--1" data-num="1" role="listitem">
+          <span class="phase-card__icon" role="img" aria-label="Fase armonía">⬜</span>
+          <span class="phase-card__num">FASE 01</span>
+          <h3 class="phase-card__title">Armonía Controlada</h3>
+          <p class="phase-card__body">Espacio blanco, minimalista, silencioso. La voz de LIRA guía con suavidad. Ondas, luces, vibraciones tranquilas. Todo en equilibrio.</p>
+        </div>
+
+        <div class="phase-card phase-card--2" data-num="2" role="listitem">
+          <span class="phase-card__icon" role="img" aria-label="Fase desorientación">🌀</span>
+          <span class="phase-card__num">FASE 02</span>
+          <h3 class="phase-card__title">Desorientación</h3>
+          <p class="phase-card__body">Las paredes se estrechan. El sonido se repite. Figuras abstractas invaden. El horizonte desaparece. El espacio se rompe. ¿Estás obedeciendo o siendo controlado?</p>
+        </div>
+
+        <div class="phase-card phase-card--3" data-num="3" role="listitem">
+          <span class="phase-card__icon" role="img" aria-label="Fase decisión">✋</span>
+          <span class="phase-card__num">FASE 03</span>
+          <h3 class="phase-card__title">La Decisión</h3>
+          <p class="phase-card__body">El momento culminante. El sistema está en su máximo control. Dos opciones: seguir obedeciendo a la voz, o quitarte las gafas de VR.</p>
+        </div>
+
+      </div>
+
+      <div class="divider" style="margin:4rem 0"></div>
+
+      <!-- SENSORY DESIGN -->
+      <div class="section__header fade-in">
+        <span class="section__tag">// Diseño sensorial</span>
+        <h2 class="section__title" style="font-size:1.5rem">Elementos de la experiencia</h2>
+      </div>
+
+      <div class="sensory-list fade-in" role="list" aria-label="Elementos sensoriales de la experiencia VR">
+        <div class="sensory-row" role="listitem">
+          <span class="sensory-row__icon" role="img" aria-label="Sonido">🔊</span>
+          <span class="sensory-row__label">Audio binaural espacializado — la voz de LIRA en todos lados</span>
+          <span class="sensory-row__state">DISEÑO PENDIENTE</span>
+        </div>
+        <div class="sensory-row" role="listitem">
+          <span class="sensory-row__icon" role="img" aria-label="Visual">👁️</span>
+          <span class="sensory-row__label">Entorno 3D generativo — responde a cada movimiento del usuario</span>
+          <span class="sensory-row__state">EN DESARROLLO</span>
+        </div>
+        <div class="sensory-row" role="listitem">
+          <span class="sensory-row__icon" role="img" aria-label="Vibración">📳</span>
+          <span class="sensory-row__label">Háptica — feedback de vibración que escala con la presión narrativa</span>
+          <span class="sensory-row__state">PLANIFICADO</span>
+        </div>
+        <div class="sensory-row" role="listitem">
+          <span class="sensory-row__icon" role="img" aria-label="Silencio">🔇</span>
+          <span class="sensory-row__label">El silencio como elemento narrativo — ausencia que genera tensión</span>
+          <span class="sensory-row__state">DEFINIDO</span>
+        </div>
+        <div class="sensory-row" role="listitem">
+          <span class="sensory-row__icon" role="img" aria-label="Respiración">🌬️</span>
+          <span class="sensory-row__label">Respiración amplificada de Sofía — guía del ritmo emocional</span>
+          <span class="sensory-row__state">DEFINIDO</span>
+        </div>
+      </div>
+
+      <div class="placeholder-zone fade-in" style="margin-top:3rem" role="region" aria-label="Espacio de archivos VR">
+        <span class="placeholder-zone__icon" aria-hidden="true">🥽</span>
+        <span class="placeholder-zone__title">Archivos de experiencia VR · Próximamente</span>
+        <span class="placeholder-zone__hint">// .GLB · .WebXR · Escenas 3D</span>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="index.html">Inicio</a>
+      <a href="moodreel.html">Moodreel</a>
+      <a href="podcast.html">Podcast</a>
+      <a href="corto.html">Corto</a>
+      <a href="redes-sociales.html">Redes</a>
+    </nav>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">// LIRA_SYSTEM v1.0 · BETA</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

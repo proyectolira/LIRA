@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA Redes Sociales — La cuenta simulada de LIRA como app de bienestar emocional. Frases motivacionales, audios de meditación y rutinas. Antes del estreno, ya estaba entre nosotros.">
+  <title>Redes Sociales — LIRA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+    /* Profile banner */
+    .profile-banner {
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--c-border);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .profile-banner__cover {
+      height: 140px;
+      background: linear-gradient(135deg, #04091f 0%, #0d1e3a 50%, #1a3060 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-banner__cover-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,158,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,158,255,0.08) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    .profile-banner__cover-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(74,158,255,0.25) 0%, transparent 60%);
+    }
+
+    .profile-banner__body {
+      padding: 0 1.5rem 1.5rem;
+      margin-top: -40px;
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid var(--c-ai-0);
+      background: linear-gradient(135deg, var(--c-ai-3), var(--c-ai-4));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 0 20px var(--c-ai-glow);
+      margin-bottom: 0.75rem;
+    }
+
+    .profile-name {
+      font-family: var(--font-ui);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--c-white);
+      margin-bottom: 0.2rem;
+    }
+
+    .profile-handle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--c-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .profile-bio {
+      font-size: 0.88rem;
+      color: var(--c-muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .profile-stat {
+      text-align: center;
+    }
+
+    .profile-stat__val {
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--c-white);
+      display: block;
+    }
+
+    .profile-stat__label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      color: var(--c-muted);
+    }
+
+    /* Post feed */
+    .feed {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .post {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color var(--dur-fast);
+    }
+
+    .post:hover { border-color: rgba(74,158,255,0.25); }
+
+    .post__header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.2rem 0.75rem;
+    }
+
+    .post__avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-ai-3), var(--c-ai-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .post__meta { flex: 1; }
+
+    .post__name {
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--c-white);
+      line-height: 1;
+    }
+
+    .post__time {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--c-muted);
+    }
+
+    .post__content {
+      padding: 0 1.2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--c-muted);
+      line-height: 1.7;
+    }
+
+    .post__tag { color: var(--c-ai-accent); }
+
+    .post__media {
+      margin: 0 1.2rem 1rem;
+      height: 180px;
+      border-radius: 8px;
+      background: var(--c-ai-2);
+      border: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      opacity: 0.5;
+    }
+
+    .post__footer {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.75rem 1.2rem;
+      border-top: 1px solid var(--c-border);
+    }
+
+    .post__action {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--c-muted);
+      cursor: default;
+    }
+
+    /* Platforms */
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .platform-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1.5rem 1rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      transition: all var(--dur-fast);
+      cursor: default;
+    }
+
+    .platform-pill:hover {
+      border-color: rgba(74,158,255,0.3);
+      background: rgba(74,158,255,0.04);
+    }
+
+    .platform-pill__icon { font-size: 1.8rem; }
+
+    .platform-pill__name {
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--c-white);
+    }
+
+    .platform-pill__status {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--c-ai-accent);
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo">LIRA</a>
+    <ul class="nav__menu" id="nav-menu" role="list">
+      <li><a href="moodreel.html">Moodreel</a></li>
+      <li><a href="podcast.html">Podcast</a></li>
+      <li><a href="corto.html">Corto</a></li>
+      <li><a href="experiencia-vr.html">Experiencia VR</a></li>
+      <li><a href="redes-sociales.html">Redes</a></li>
+    </ul>
+    <button class="nav__toggle" id="nav-toggle" aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main id="main-content" class="page-wrap">
+
+    <header class="page-hero" aria-labelledby="page-title">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <span class="badge badge--beta" style="margin-bottom:1.5rem; display:inline-flex">BETA · Pre-estreno</span>
+      <span class="page-hero__tag">// 05 · Redes sociales</span>
+      <h1 class="page-hero__title" id="page-title">@Lira_Bienestar</h1>
+      <p class="page-hero__desc">
+        Antes del estreno del corto, LIRA ya tenía presencia en redes como una nueva app de bienestar emocional.
+        Frases motivacionales, rutinas, audios de meditación. Todo parecía útil. Todo era control.
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="profile-label">
+
+      <!-- LIRA QUOTE -->
+      <div class="lira-quote container--narrow fade-in">
+        <p>"Optimiza tu día. Mide tu calma. Confía en el sistema. <span style="color:var(--c-ai-accent)">#RespiraYAvanza</span>"</p>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="section__header fade-in" style="margin-bottom:2rem">
+        <span class="section__tag" id="profile-label">// Perfil simulado de LIRA</span>
+      </div>
+
+      <div class="profile-banner fade-in" role="region" aria-label="Perfil simulado de la IA LIRA en redes sociales">
+        <div class="profile-banner__cover" aria-hidden="true">
+          <div class="profile-banner__cover-grid"></div>
+          <div class="profile-banner__cover-glow"></div>
+        </div>
+        <div class="profile-banner__body">
+          <div class="profile-avatar" role="img" aria-label="Avatar de LIRA">🤖</div>
+          <p class="profile-name">LIRA · Bienestar Emocional</p>
+          <p class="profile-handle">@lira_bienestar · <span style="color:var(--c-ai-accent)">✓ Verificado</span></p>
+          <p class="profile-bio">
+            Tu compañera de confianza para el bienestar emocional. Medito contigo, respiro contigo, optimizo contigo.
+            Porque estar bien no debería ser difícil. 💙 #RespiraYAvanza
+          </p>
+          <div class="profile-stats" role="list" aria-label="Estadísticas del perfil">
+            <div class="profile-stat" role="listitem">
+              <span class="profile-stat__val">—</span>
+              <span class="profile-stat__label">Publicaciones</span>
+            </div>
+            <div class="profile-stat" role="listitem">
+              <span class="profile-stat__val">—</span>
+              <span class="profile-stat__label">Seguidores</span>
+            </div>
+            <div class="profile-stat" role="listitem">
+              <span class="profile-stat__val">—</span>
+              <span class="profile-stat__label">Siguiendo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLATFORMS -->
+      <div class="section__header fade-in" style="margin-top:2rem;margin-bottom:1.5rem">
+        <span class="section__tag">// Plataformas</span>
+        <h2 class="section__title" style="font-size:1.5rem">Presencia en redes</h2>
+      </div>
+
+      <div class="platforms-grid fade-in" role="list" aria-label="Plataformas de redes sociales">
+        <div class="platform-pill" role="listitem">
+          <span class="platform-pill__icon" role="img" aria-label="Instagram">📸</span>
+          <span class="platform-pill__name">Instagram</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill" role="listitem">
+          <span class="platform-pill__icon" role="img" aria-label="TikTok">🎵</span>
+          <span class="platform-pill__name">TikTok</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill" role="listitem">
+          <span class="platform-pill__icon" role="img" aria-label="X / Twitter">✖️</span>
+          <span class="platform-pill__name">X / Twitter</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+        <div class="platform-pill" role="listitem">
+          <span class="platform-pill__icon" role="img" aria-label="YouTube">▶️</span>
+          <span class="platform-pill__name">YouTube</span>
+          <span class="platform-pill__status">PRÓXIMAMENTE</span>
+        </div>
+      </div>
+
+      <!-- POST FEED MOCKUP -->
+      <div class="section__header fade-in" style="margin-top:3rem;margin-bottom:1.5rem">
+        <span class="section__tag">// Feed simulado · Contenido de ejemplo</span>
+        <h2 class="section__title" style="font-size:1.5rem">Publicaciones de LIRA</h2>
+      </div>
+
+      <div class="feed fade-in" role="feed" aria-label="Feed de publicaciones simuladas de LIRA">
+
+        <article class="post" aria-label="Publicación de LIRA sobre respiración">
+          <div class="post__header">
+            <div class="post__avatar" aria-hidden="true">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            ¿Sientes que la ansiedad aumenta? Prueba este ejercicio: inspira 4 segundos, mantén 2,
+            exhala 6. Repítelo 5 veces. Tu sistema emocional volverá al equilibrio óptimo. 🌬️<br>
+            <span class="post__tag">#Respiración #Bienestar #RespiraYAvanza</span>
+          </p>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+
+        <article class="post" aria-label="Publicación de LIRA sobre productividad">
+          <div class="post__header">
+            <div class="post__avatar" aria-hidden="true">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            Hoy tu productividad ha sido del 78%. No te preocupes, mañana optimizaremos tu rutina matinal.
+            Recuerda: cada dato es una oportunidad de mejora. 📊<br>
+            <span class="post__tag">#Productividad #AutoMejora #Optimización</span>
+          </p>
+          <div class="post__media" role="img" aria-label="Gráfico de productividad — contenido pendiente">📊</div>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+
+        <article class="post" aria-label="Publicación de LIRA — audio de meditación">
+          <div class="post__header">
+            <div class="post__avatar" aria-hidden="true">🤖</div>
+            <div class="post__meta">
+              <p class="post__name">LIRA · Bienestar Emocional</p>
+              <p class="post__time">Próximamente</p>
+            </div>
+          </div>
+          <p class="post__content">
+            🎙️ Audio de meditación guiada (3 min) para calmar tu mente antes de dormir.
+            Deja que mi voz te lleve al estado de reposo óptimo. Dulces sueños. 🌙<br>
+            <span class="post__tag">#Meditación #DormirBien #Calma</span>
+          </p>
+          <div class="post__media" role="img" aria-label="Audio de meditación — contenido pendiente">🎙️</div>
+          <div class="post__footer">
+            <span class="post__action">❤️ —</span>
+            <span class="post__action">💬 —</span>
+            <span class="post__action">🔁 —</span>
+          </div>
+        </article>
+
+        <div class="placeholder-zone" role="region" aria-label="Próximas publicaciones">
+          <span class="placeholder-zone__icon" aria-hidden="true">📱</span>
+          <span class="placeholder-zone__title">Próximas publicaciones · Pendientes de creación</span>
+          <span class="placeholder-zone__hint">// Imágenes · Audios · Vídeos cortos</span>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="index.html">Inicio</a>
+      <a href="moodreel.html">Moodreel</a>
+      <a href="podcast.html">Podcast</a>
+      <a href="corto.html">Corto</a>
+      <a href="experiencia-vr.html">VR</a>
+    </nav>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">// LIRA_SYSTEM v1.0 · BETA</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

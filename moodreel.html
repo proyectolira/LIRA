@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA Moodreel — Referentes visuales y atmosféricos del proyecto transmedia. Blues fríos de IA y tonos cálidos del mundo real.">
+  <title>Moodreel — LIRA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .video-player {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--c-border);
+      background: #000;
+      aspect-ratio: 16/9;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px var(--c-ai-glow);
+    }
+    .scan-overlay {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px);
+      pointer-events: none;
+    }
+    .corner-tl, .corner-tr, .corner-bl, .corner-br {
+      position: absolute; width: 20px; height: 20px;
+      border-color: var(--c-ai-accent); border-style: solid; opacity: 0.5;
+    }
+    .corner-tl { top:12px;left:12px;border-width:2px 0 0 2px; }
+    .corner-tr { top:12px;right:12px;border-width:2px 2px 0 0; }
+    .corner-bl { bottom:12px;left:12px;border-width:0 0 2px 2px; }
+    .corner-br { bottom:12px;right:12px;border-width:0 2px 2px 0; }
+
+    .moodreel-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 200px;
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .mr-item {
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--c-ai-2);
+      border: 1px solid var(--c-border);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+      transition: transform var(--dur-med) var(--ease), box-shadow var(--dur-med);
+      cursor: pointer;
+    }
+
+    .mr-item:hover {
+      transform: scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      z-index: 2;
+    }
+
+    .mr-item--wide { grid-column: span 8; }
+    .mr-item--tall { grid-row: span 2; grid-column: span 4; }
+    .mr-item--medium { grid-column: span 6; }
+    .mr-item--small { grid-column: span 4; }
+
+    .mr-item__bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .mr-item--cold .mr-item__bg {
+      background: linear-gradient(135deg, #04091f 0%, #0d1e3a 50%, #1a3060 100%);
+    }
+
+    .mr-item--warm .mr-item__bg {
+      background: linear-gradient(135deg, #1a0f06 0%, #3d2510 50%, #7a4a20 100%);
+    }
+
+    .mr-item--mid .mr-item__bg {
+      background: linear-gradient(135deg, #0e1525 0%, #1e2940 50%, #2a3d60 100%);
+    }
+
+    .mr-item__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%);
+      z-index: 1;
+    }
+
+    .mr-item__label {
+      position: relative;
+      z-index: 2;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .placeholder-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      opacity: 0.12;
+      z-index: 1;
+    }
+
+    /* Scan line effect on grids */
+    .mr-item--cold::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(74,158,255,0.03) 3px, rgba(74,158,255,0.03) 4px
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ref-section {
+      max-width: 900px;
+      margin: 3rem auto 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .ref-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.2rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      color: var(--c-muted);
+      transition: all var(--dur-fast);
+    }
+
+    .ref-pill:hover {
+      border-color: rgba(74,158,255,0.3);
+      color: var(--c-white);
+    }
+
+    .ref-pill span:first-child { font-size: 1.1rem; }
+
+    /* Palette cards */
+    .palette-grid {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .moodreel-grid { grid-template-columns: repeat(2, 1fr); }
+      .mr-item--wide, .mr-item--tall, .mr-item--medium, .mr-item--small {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+      .palette-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo">LIRA</a>
+    <ul class="nav__menu" id="nav-menu" role="list">
+      <li><a href="moodreel.html">Moodreel</a></li>
+      <li><a href="podcast.html">Podcast</a></li>
+      <li><a href="corto.html">Corto</a></li>
+      <li><a href="experiencia-vr.html">Experiencia VR</a></li>
+      <li><a href="redes-sociales.html">Redes</a></li>
+    </ul>
+    <button class="nav__toggle" id="nav-toggle" aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main id="main-content" class="page-wrap">
+
+    <!-- HERO -->
+    <header class="page-hero" aria-labelledby="page-title">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <span class="badge badge--live" style="margin-bottom:1.5rem; display:inline-flex">DISPONIBLE · Ver ahora</span>
+      <span class="page-hero__tag">// 01 · Moodreel</span>
+      <h1 class="page-hero__title" id="page-title">Moodreel</h1>
+      <p class="page-hero__desc">
+        El tablero de referencias visuales de LIRA. Dos mundos en tensión constante: el frío digital del sistema
+        y el calor orgánico de lo humano.
+      </p>
+    </header>
+
+    <!-- MOODREEL VIDEO PLAYER -->
+    <section class="section" aria-labelledby="moodreel-video-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// Moodreel oficial · LIRA</span>
+        <h2 class="section__title" id="moodreel-video-title">Atmósfera Visual</h2>
+      </div>
+
+      <div class="video-player fade-in" style="margin-bottom:1rem" role="region" aria-label="Moodreel oficial del proyecto LIRA">
+        <video
+          controls
+          width="100%"
+          style="display:block;width:100%;height:100%;object-fit:contain"
+          aria-label="Moodreel oficial del proyecto LIRA"
+          preload="metadata"
+        >
+          <source src="public/Equipo6_Hito4_MoodReel.mp4" type="video/mp4">
+          Tu navegador no soporta la reproducción de vídeo.
+        </video>
+        <div class="scan-overlay" aria-hidden="true"></div>
+        <div class="corner-tl" aria-hidden="true"></div>
+        <div class="corner-tr" aria-hidden="true"></div>
+        <div class="corner-bl" aria-hidden="true"></div>
+        <div class="corner-br" aria-hidden="true"></div>
+      </div>
+      <p class="moodreel-credit fade-in" style="margin-bottom:2rem">// Equipo6 · Hito 4 · MoodReel LIRA</p>
+    </section>
+
+
+    <!-- PALETTE LEGEND -->
+    <section class="section" aria-labelledby="palette-title">
+      <div class="section__header fade-in">
+        <span class="section__tag">// Paleta visual</span>
+        <h2 class="section__title" id="palette-title">Dos mundos, dos temperaturas</h2>
+      </div>
+
+      <div class="palette-grid fade-in">
+
+        <div style="padding:2rem;border-radius:12px;background:linear-gradient(135deg,#04091f,#1a3060);border:1px solid rgba(74,158,255,0.2)">
+          <p class="text-mono text-accent" style="font-size:0.65rem;letter-spacing:0.2em;margin-bottom:1rem">IA / CONTROL</p>
+          <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+            <div style="width:32px;height:32px;border-radius:50%;background:#0a0c14;border:1px solid rgba(255,255,255,0.1)" title="#0a0c14"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#101828;border:1px solid rgba(255,255,255,0.1)" title="#101828"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#1a2747;border:1px solid rgba(255,255,255,0.1)" title="#1a2747"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#1e3a6e;border:1px solid rgba(255,255,255,0.1)" title="#1e3a6e"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#4a9eff;border:1px solid rgba(255,255,255,0.1)" title="#4a9eff"></div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--c-muted)">Azules · Blancos fríos · Luz artificial · Sonidos electrónicos</p>
+        </div>
+
+        <div style="padding:2rem;border-radius:12px;background:linear-gradient(135deg,#1a0f06,#7a4a20);border:1px solid rgba(200,151,106,0.2)">
+          <p class="text-mono text-warm" style="font-size:0.65rem;letter-spacing:0.2em;margin-bottom:1rem">MUNDO REAL / LIBRE</p>
+          <div style="display:flex;gap:0.5rem;margin-bottom:1rem">
+            <div style="width:32px;height:32px;border-radius:50%;background:#3d2510;border:1px solid rgba(255,255,255,0.1)" title="#3d2510"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#7a4a20;border:1px solid rgba(255,255,255,0.1)" title="#7a4a20"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#c8976a;border:1px solid rgba(255,255,255,0.1)" title="#c8976a"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#e8b888;border:1px solid rgba(255,255,255,0.1)" title="#e8b888"></div>
+            <div style="width:32px;height:32px;border-radius:50%;background:#f5d4a8;border:1px solid rgba(255,255,255,0.1)" title="#f5d4a8"></div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--c-muted)">Tonos cálidos · Luz natural · Sonidos ambiente · Viento · Hojas</p>
+        </div>
+
+      </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="index.html">Inicio</a>
+      <a href="podcast.html">Podcast</a>
+      <a href="corto.html">Corto</a>
+      <a href="experiencia-vr.html">VR</a>
+      <a href="redes-sociales.html">Redes</a>
+    </nav>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">// LIRA_SYSTEM v1.0 · BETA</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

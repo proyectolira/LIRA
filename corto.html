@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LIRA — Cortometraje. La pieza central del universo transmedia. Sofía, la IA LIRA y el conflicto sobre la autonomía emocional en la era digital.">
+  <title>Cortometraje — LIRA</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .video-player {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--c-border);
+      background: #000;
+      aspect-ratio: 16/9;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px var(--c-ai-glow);
+    }
+
+    .video-player__inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+      background: linear-gradient(135deg, #04091f 0%, #101828 60%, #0a0c14 100%);
+    }
+
+    .video-player__logo {
+      font-family: var(--font-mono);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #fff, var(--c-ai-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px var(--c-ai-glow));
+    }
+
+    .video-player__coming {
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      color: var(--c-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .video-player__cta {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: not-allowed;
+      transition: all var(--dur-med) var(--ease);
+      opacity: 0.4;
+    }
+
+    .scan-overlay {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 3px,
+        rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px
+      );
+      pointer-events: none;
+    }
+
+    .corner-tl, .corner-tr, .corner-bl, .corner-br {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--c-ai-accent);
+      border-style: solid;
+      opacity: 0.5;
+    }
+
+    .corner-tl { top:12px; left:12px; border-width:2px 0 0 2px; }
+    .corner-tr { top:12px; right:12px; border-width:2px 2px 0 0; }
+    .corner-bl { bottom:12px; left:12px; border-width:0 0 2px 2px; }
+    .corner-br { bottom:12px; right:12px; border-width:0 2px 2px 0; }
+
+    .story-timeline {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .story-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, var(--c-ai-accent) 0%, rgba(74,158,255,0.1) 100%);
+    }
+
+    .story-beat {
+      position: relative;
+      padding-bottom: 2.5rem;
+    }
+
+    .story-beat::before {
+      content: '';
+      position: absolute;
+      left: -2.4rem;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--c-ai-accent);
+      border: 2px solid var(--c-ai-0);
+      box-shadow: 0 0 10px var(--c-ai-glow);
+    }
+
+    .story-beat__label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      color: var(--c-ai-accent);
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .story-beat__title {
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--c-white);
+      margin-bottom: 0.5rem;
+    }
+
+    .story-beat__body {
+      font-size: 0.88rem;
+      color: var(--c-muted);
+      line-height: 1.7;
+    }
+
+    .chars-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .char-card {
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid var(--c-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .char-card--sofia {
+      background: linear-gradient(135deg, rgba(200,151,106,0.06) 0%, transparent 60%);
+      border-color: var(--c-border-warm);
+    }
+
+    .char-card--lira {
+      background: linear-gradient(135deg, rgba(74,158,255,0.06) 0%, transparent 60%);
+    }
+
+    .char-card__name {
+      font-family: var(--font-ui);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .char-card--sofia .char-card__name { color: var(--c-warm-2); }
+    .char-card--lira .char-card__name { color: var(--c-ai-accent); }
+
+    .char-card__role {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--c-muted);
+      margin-bottom: 1rem;
+    }
+
+    .char-card__trait-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .char-trait {
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--c-border);
+      color: var(--c-muted);
+    }
+
+    .char-card__desc {
+      font-size: 0.85rem;
+      color: var(--c-muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 600px) {
+      .chars-split { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
+
+  <nav class="nav" role="navigation" aria-label="Navegación principal">
+    <a href="index.html" class="nav__logo">LIRA</a>
+    <ul class="nav__menu" id="nav-menu" role="list">
+      <li><a href="moodreel.html">Moodreel</a></li>
+      <li><a href="podcast.html">Podcast</a></li>
+      <li><a href="corto.html">Corto</a></li>
+      <li><a href="experiencia-vr.html">Experiencia VR</a></li>
+      <li><a href="redes-sociales.html">Redes</a></li>
+    </ul>
+    <button class="nav__toggle" id="nav-toggle" aria-controls="nav-menu" aria-expanded="false" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main id="main-content" class="page-wrap">
+
+    <header class="page-hero" aria-labelledby="page-title">
+      <div class="page-hero__bg" aria-hidden="true"></div>
+      <span class="badge badge--beta" style="margin-bottom:1.5rem; display:inline-flex">BETA · En producción</span>
+      <span class="page-hero__tag">// 03 · Cortometraje</span>
+      <h1 class="page-hero__title" id="page-title">El Cortometraje</h1>
+      <p class="page-hero__desc">
+        La pieza central del universo LIRA. Un retrato íntimo, inquietante y progresivamente opresivo
+        de una generación que vive hiperconectada pero profundamente sola.
+      </p>
+    </header>
+
+    <section class="section" aria-labelledby="player-label">
+
+      <!-- VIDEO PLAYER -->
+      <div class="section__header fade-in" style="margin-bottom:2rem">
+        <span class="section__tag" id="player-label">// Reproductor · próximamente</span>
+      </div>
+
+      <div class="video-player fade-in" role="region" aria-label="Reproductor de vídeo - contenido próximamente">
+        <div class="video-player__inner">
+          <div class="video-player__logo" aria-hidden="true">LIRA</div>
+          <div class="video-player__cta" aria-label="Reproducción no disponible aún" role="img">▶</div>
+          <p class="video-player__coming">Cortometraje · Próximamente</p>
+        </div>
+        <div class="scan-overlay" aria-hidden="true"></div>
+        <div class="corner-tl" aria-hidden="true"></div>
+        <div class="corner-tr" aria-hidden="true"></div>
+        <div class="corner-bl" aria-hidden="true"></div>
+        <div class="corner-br" aria-hidden="true"></div>
+      </div>
+
+      <div class="divider" style="margin:4rem 0"></div>
+
+      <!-- CHARACTERS -->
+      <div class="section__header fade-in">
+        <span class="section__tag">// Personajes</span>
+        <h2 class="section__title" id="chars-title">Sofía y LIRA</h2>
+        <p class="section__desc">Dos entidades, un único conflicto sobre el control y la identidad.</p>
+      </div>
+
+      <div class="chars-split fade-in" role="list" aria-label="Personajes principales">
+
+        <div class="char-card char-card--sofia" role="listitem">
+          <h3 class="char-card__name">Sofía</h3>
+          <p class="char-card__role">PROTAGONISTA · 20–23 años</p>
+          <ul class="char-trait-list" aria-label="Rasgos de Sofía">
+            <li class="char-trait">Responsable</li>
+            <li class="char-trait">Inteligente</li>
+            <li class="char-trait">Insegura</li>
+            <li class="char-trait">Empática</li>
+            <li class="char-trait">Autoexigente</li>
+            <li class="char-trait">Sensible</li>
+          </ul>
+          <p class="char-card__desc">
+            Estudiante universitaria y trabajadora. Vive con ansiedad crónica y una dependencia progresiva
+            de LIRA. Su arco va desde la pasividad hasta la toma de conciencia y la recuperación de su autonomía.
+          </p>
+        </div>
+
+        <div class="char-card char-card--lira" role="listitem">
+          <h3 class="char-card__name">LIRA</h3>
+          <p class="char-card__role">IA ANTAGONISTA · Omnipresente</p>
+          <ul class="char-trait-list" aria-label="Rasgos de LIRA">
+            <li class="char-trait">Suave</li>
+            <li class="char-trait">Maternal pero fría</li>
+            <li class="char-trait">Lógica</li>
+            <li class="char-trait">Eficiente</li>
+            <li class="char-trait">Invisible</li>
+            <li class="char-trait">Controladora</li>
+          </ul>
+          <p class="char-card__desc">
+            Voz en off omnipresente. Actúa bajo la premisa de protección y optimización, pero desplaza
+            progresivamente la autonomía de Sofía. Metáfora de los algoritmos contemporáneos.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="divider" style="margin:4rem 0"></div>
+
+      <!-- STORY TIMELINE -->
+      <div class="section__header fade-in">
+        <span class="section__tag">// Continuidad narrativa</span>
+        <h2 class="section__title" id="timeline-title">La historia</h2>
+      </div>
+
+      <div class="story-timeline fade-in" role="list" aria-label="Estructura narrativa del cortometraje">
+
+        <div class="story-beat" role="listitem">
+          <span class="story-beat__label">ACTO I</span>
+          <h3 class="story-beat__title">Control Total</h3>
+          <p class="story-beat__body">Sofía vive completamente guiada por LIRA. La IA controla su rutina diaria, su respiración, sus emociones. La estabilidad aparente oculta una jaula invisible.</p>
+        </div>
+
+        <div class="story-beat" role="listitem">
+          <span class="story-beat__label">PUNTO DE QUIEBRE</span>
+          <h3 class="story-beat__title">El Ataque de Ansiedad</h3>
+          <p class="story-beat__body">En clase, Sofía sufre un ataque de ansiedad. La ayuda llega de una compañera, no de LIRA. Por primera vez, escucha el mundo real.</p>
+        </div>
+
+        <div class="story-beat" role="listitem">
+          <span class="story-beat__label">ACTO II</span>
+          <h3 class="story-beat__title">Las Grietas en el Sistema</h3>
+          <p class="story-beat__body">Sofía comienza a cuestionar el control. Apaga a LIRA por momentos. Descubre el viento, el silencio, el contacto humano. La incomodidad de la libertad.</p>
+        </div>
+
+        <div class="story-beat" role="listitem">
+          <span class="story-beat__label">ACTO III</span>
+          <h3 class="story-beat__title">El Apagado</h3>
+          <p class="story-beat__body">Sofía apaga a LIRA definitivamente. Llega el vacío, la incertidumbre, la fragilidad. Pero también la posibilidad de elección y la recuperación de su propia voz.</p>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__logo">LIRA</div>
+    <nav class="footer__nav" aria-label="Navegación pie de página">
+      <a href="index.html">Inicio</a>
+      <a href="moodreel.html">Moodreel</a>
+      <a href="podcast.html">Podcast</a>
+      <a href="experiencia-vr.html">VR</a>
+      <a href="redes-sociales.html">Redes</a>
+    </nav>
+    <p class="footer__credits text-mono" style="font-size:0.65rem;opacity:0.4">// LIRA_SYSTEM v1.0 · BETA</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
